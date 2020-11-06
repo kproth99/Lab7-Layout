@@ -1,0 +1,10 @@
+h1 {
+	font-family: 'Six Caps', sans-serif;
+	color: rgba(28, 84, 168, 0.75);
+  text-shadow: -2px -2px 0 rgba(0, 0, 0, 0.125);
+  font-size: 100px;
+}
+
+body {
+  font-family: 'Staatliches', cursive;
+}
