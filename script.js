@@ -24,7 +24,7 @@ d3.json("world-110m.json", d3.autoType)]).then(data=>{
   
     const force = d3.forceSimulation(airports.nodes)
         .force("charge", d3.forceManyBody())
-        .force("link", d3.forceLink(airports.links))
+        .force("link", d3.forceLink(airports.links).distance(40))
         .force('x', d3.forceX(width / 2))
         .force('y', d3.forceY(height / 2));
    
@@ -43,11 +43,11 @@ d3.json("world-110m.json", d3.autoType)]).then(data=>{
       .attr("d", path);
   }
 
-  forceDiagram();
+  forceDiagram(); //call the force back to the container
 
-  d3.selectAll("input[name=display]").on("change", event =>{
+  d3.selectAll("input[name=display]").on("change", event =>{ //radio buttonn
     visType = event.target.value
-    console.log("vistype", visType)
+    console.log("type", visType)
     
     switchLayout();
   })
@@ -76,9 +76,9 @@ d3.json("world-110m.json", d3.autoType)]).then(data=>{
           .attr('y2',(d) => (d.target.y))
           .attr('stroke', 'black')
           .transition()
-          .duration(1000)
+          .duration(900)
           .attr("x1", function(d) {
-            return projection([d.source.longitude, d.source.latitude])[0];
+            return projection([d.source.longitude, d.source.latitude])[0]; //place circles on lat/long
           })
           .attr("y1", function(d) {
             return projection([d.source.longitude, d.source.latitude])[1];
@@ -99,7 +99,7 @@ d3.json("world-110m.json", d3.autoType)]).then(data=>{
               .attr('cy', (d,i)=>(d.y))
               .attr('fill', 'salmon') 
               .attr('r',d=>mapSize(d.passengers))
-              .on("mouseenter", (event, d) => {
+              .on("mouseenter", (event, d) => { 
                 const pos = d3.pointer(event, window);
                 d3.selectAll(".tooltip")
                   .style("display", "inline-block")
@@ -115,7 +115,7 @@ d3.json("world-110m.json", d3.autoType)]).then(data=>{
                 d3.selectAll(".tooltip").style("display", "none");
               })
               .transition()
-              .duration(1000)
+              .duration(900)
               .attr("cx", function(d) {
                 return projection([d.longitude, d.latitude])[0];
               })
@@ -128,7 +128,7 @@ d3.json("world-110m.json", d3.autoType)]).then(data=>{
         .attr("opacity", 0);
 
       svg.selectAll('.force')
-        .remove()
+        .remove();
 
     svg.selectAll("path")
         .transition()
@@ -138,9 +138,9 @@ d3.json("world-110m.json", d3.autoType)]).then(data=>{
     } else { 
 
       forceDiagram();
-      
+
       svg.selectAll("path")
-            .attr("opacity", 0);
+            .attr("opacity", 0)
     }
   }
 
@@ -177,7 +177,7 @@ d3.json("world-110m.json", d3.autoType)]).then(data=>{
             .on("end", dragEnded); 
       }
 
-      force.alpha(0.5).restart();
+      force.alpha(0.2).restart();
 
      let link = svg
         .selectAll(".chart")
