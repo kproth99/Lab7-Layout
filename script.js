@@ -41,6 +41,7 @@ d3.json("world-110m.json", d3.autoType)]).then(data=>{
       .attr("class", "subunit-boundary")
       .attr('stroke', 'white')
       .attr("d", path);
+    
   }
 
   forceDiagram(); //call the force back to the container
@@ -57,15 +58,15 @@ d3.json("world-110m.json", d3.autoType)]).then(data=>{
     if (visType === "map"){
       drawMap();
       
-      let mapSize = d3.scaleLinear()
+      const mapSize = d3.scaleLinear()
         .domain(d3.extent(airports.nodes, d=>d.passengers))
-        .range([3,10])
+        .range([3,9])
 
       drag = force => {
         drag.filter(event => visType === "force")
       }
 
-      let linksMap = svg.selectAll('.chart')
+      const linksMap = svg.selectAll('.chart')
           .data(data[0].links)
           .enter()
           .append('line')
@@ -77,6 +78,7 @@ d3.json("world-110m.json", d3.autoType)]).then(data=>{
           .attr('stroke', 'black')
           .transition()
           .duration(900)
+          .ease(d3.easeLinear)
           .attr("x1", function(d) {
             return projection([d.source.longitude, d.source.latitude])[0]; //place circles on lat/long
           })
@@ -90,7 +92,7 @@ d3.json("world-110m.json", d3.autoType)]).then(data=>{
             return projection([d.target.longitude, d.target.latitude])[1];
           });
   
-      let nodes = svg.selectAll('.chart')
+      const nodes = svg.selectAll('.chart')
               .data(data[0].nodes)
               .enter()
               .append('circle')
@@ -98,16 +100,17 @@ d3.json("world-110m.json", d3.autoType)]).then(data=>{
               .attr('cx', (d,i)=>(d.x))
               .attr('cy', (d,i)=>(d.y))
               .attr('fill', 'salmon') 
-              .attr('r',d=>mapSize(d.passengers))
+              .attr("r", function(d){
+                return mapSize(d.passengers)})
               .on("mouseenter", (event, d) => { 
                 const pos = d3.pointer(event, window);
                 d3.selectAll(".tooltip")
                   .style("display", "inline-block")
                   .style("position", "fixed")
-                  .style("font-size", "15px")
+                  .style("font-size", "13px")
                   .style("color", "white")
                   .style("background-color", "black")
-                  .style("top", pos[1] + "px")
+                  .style("top", pos[1] + "px") //call to the correct csv
                   .style("left", pos[0] + "px")
                   .html(d.name);
               })
@@ -116,13 +119,14 @@ d3.json("world-110m.json", d3.autoType)]).then(data=>{
               })
               .transition()
               .duration(900)
+              .ease(d3.easeLinear)
               .attr("cx", function(d) {
                 return projection([d.longitude, d.latitude])[0];
               })
               .attr("cy", function(d) {
                 return projection([d.longitude, d.latitude])[1];
               })
-       
+      
       
       svg.selectAll("path")
         .attr("opacity", 0);
@@ -133,12 +137,12 @@ d3.json("world-110m.json", d3.autoType)]).then(data=>{
     svg.selectAll("path")
         .transition()
         .delay(450)
+        .ease(d3.easeLinear)
         .attr("opacity", 1);
-
+    
     } else { 
 
       forceDiagram();
-
       svg.selectAll("path")
             .attr("opacity", 0)
     }
@@ -148,11 +152,11 @@ d3.json("world-110m.json", d3.autoType)]).then(data=>{
     svg.selectAll('.map')
     .remove()
 
-      let forceSize = d3.scaleLinear()
+      const forceSize = d3.scaleLinear()
         .domain(d3.extent(airports.nodes, d=>d.passengers))
-        .range([3,10])
+        .range([3,9])
  
-      let drag = force => {
+      const drag = force => {
 
         function dragStarted(event) {
           if (!event.active) force.alphaTarget(0.3).restart();
@@ -177,9 +181,9 @@ d3.json("world-110m.json", d3.autoType)]).then(data=>{
             .on("end", dragEnded); 
       }
 
-      force.alpha(0.2).restart();
+      force.alpha(0.2).restart(); //call the simulation to restart
 
-     let link = svg
+     const link = svg
         .selectAll(".chart")
         .data(data[0].links)
         .enter()
@@ -187,7 +191,7 @@ d3.json("world-110m.json", d3.autoType)]).then(data=>{
         .attr('class','force')
         .attr("stroke", "black");
       
-      let nodes = svg
+      const nodes = svg
         .selectAll(".node")
         .data(data[0].nodes)
         .enter()
@@ -195,10 +199,10 @@ d3.json("world-110m.json", d3.autoType)]).then(data=>{
         .attr("class", "force")
         .attr('cx', (d,i)=>(d.x))
         .attr('cy', (d,i)=>(d.y))
-        .attr("r", d=>forceSize(d.passengers))
+        .attr("r", function(d){
+          return forceSize(d.passengers)})
         .attr("fill", "salmon")
         .call(drag(force));
-    
 
       force.on("tick", function() {
         nodes.attr("cx", function(d) {
